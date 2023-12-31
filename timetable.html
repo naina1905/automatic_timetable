@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generated Timetable</title>
+    <style>
+        /* Add styles for the timetable display */
+        /* Example: */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .timetable {
+            margin-top: 20px;
+        }
+        .day {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .class {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generated Timetable</h1>
+    <div class="timetable">
+        {% for day, classes in timetable.items() %}
+            <div class="day">{{ day }}:</div>
+            <div class="classes">
+                {% if classes %}
+                    {% for start, end, subject in classes %}
+                        <div class="class">
+                            {% if subject != "Break" %}
+                                {{ subject }} ({{ start.strftime('%I:%M %p') }} to {{ end.strftime('%I:%M %p') }})
+                            {% else %}
+                                {{ subject }} ({{ start.strftime('%I:%M %p') }} to {{ end.strftime('%I:%M %p') }})
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="class">No classes scheduled.</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
