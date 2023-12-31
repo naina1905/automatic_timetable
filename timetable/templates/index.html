@@ -1,0 +1,85 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Timetable Scheduler</title>
+</head>
+<body>
+    <h1>Welcome to the Timetable Scheduler!</h1>
+    <form action="/" method="post">
+        <label for="start_time">Start Time:</label>
+        <input type="text" id="start_time" name="start_time" placeholder="HH:MM AM/PM"><br><br>
+        
+        <label for="end_time">End Time:</label>
+        <input type="text" id="end_time" name="end_time" placeholder="HH:MM AM/PM"><br><br>
+
+        <label for="num_subjects">Total number of subjects:</label>
+        <input type="number" id="num_subjects" name="num_subjects" min="1" max="10"><br><br>
+        
+        <div id="subject_fields">
+            <!-- Fields for subjects, durations, total classes will be added dynamically -->
+        </div>
+
+        <button type="button" onclick="addSubjectFields()">Add Subjects</button>
+        <input type="submit" value="Generate Timetable">
+    </form>
+
+    <script>
+        function addSubjectFields() {
+            const numSubjects = document.getElementById('num_subjects').value;
+            const container = document.getElementById('subject_fields');
+
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+
+            for (let i = 1; i <= numSubjects; i++) {
+                const subjectLabel = document.createElement('label');
+                subjectLabel.setAttribute('for', `subject_${i}`);
+                subjectLabel.textContent = `Subject ${i}:`;
+                
+                const subjectInput = document.createElement('input');
+                subjectInput.setAttribute('type', 'text');
+                subjectInput.setAttribute('id', `subject_${i}`);
+                subjectInput.setAttribute('name', `subject_${i}`);
+                subjectInput.setAttribute('placeholder', `Subject ${i}`);
+
+                const durationLabel = document.createElement('label');
+                durationLabel.setAttribute('for', `duration_${i}`);
+                durationLabel.textContent = `Duration for Subject ${i} (in minutes):`;
+                
+                const durationInput = document.createElement('input');
+                durationInput.setAttribute('type', 'number');
+                durationInput.setAttribute('id', `duration_${i}`);
+                durationInput.setAttribute('name', `duration_${i}`);
+                durationInput.setAttribute('min', '1');
+                durationInput.setAttribute('placeholder', `Duration for Subject ${i}`);
+
+                const totalClassesLabel = document.createElement('label');
+                totalClassesLabel.setAttribute('for', `total_classes_${i}`);
+                totalClassesLabel.textContent = `Total classes for Subject ${i} in entire week:`;
+                
+                const totalClassesInput = document.createElement('input');
+                totalClassesInput.setAttribute('type', 'number');
+                totalClassesInput.setAttribute('id', `total_classes_${i}`);
+                totalClassesInput.setAttribute('name', `total_classes_${i}`);
+                totalClassesInput.setAttribute('min', '1');
+                totalClassesInput.setAttribute('placeholder', `Total classes for Subject ${i}`);
+
+                container.appendChild(subjectLabel);
+                container.appendChild(subjectInput);
+                container.appendChild(document.createElement('br'));
+                container.appendChild(durationLabel);
+                container.appendChild(durationInput);
+                container.appendChild(document.createElement('br'));
+                container.appendChild(totalClassesLabel);
+                container.appendChild(totalClassesInput);
+                container.appendChild(document.createElement('br'));
+                container.appendChild(document.createElement('br'));
+            }
+        }
+    </script>
+</body>
+</html>
