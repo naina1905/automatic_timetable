@@ -1,0 +1,621 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/naina1905/automatic_timetable/blob/main/pandas\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "8-0rj1feiJs7"
+      },
+      "source": [
+        "\n",
+        "\n",
+        "```\n",
+        "# This is formatted as code\n",
+        "```\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "EidKd0K7i12m"
+      },
+      "outputs": [],
+      "source": [
+        "pip install scholar-scraper"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "JBJ_ONzTJh0i"
+      },
+      "outputs": [],
+      "source": [
+        "from scholar_scraper import scholar_scraper\n",
+        "scholarIds = [\n",
+        "\n",
+        "    'yxqKxj8AAAAJ'\n",
+        "]\n",
+        "\n",
+        "text=scholar_scraper.start_scraping(scholarIds)\n",
+        "print(text)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "B0VihEoRJlkI"
+      },
+      "outputs": [],
+      "source": [
+        "text"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "CEfAKoZ-JqIM"
+      },
+      "outputs": [],
+      "source": [
+        "import json\n",
+        "json_text = json.dumps(text, indent=2)\n",
+        "print(json_text)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "SshDDAUlJ_y6"
+      },
+      "outputs": [],
+      "source": [
+        "with open('data.json', 'w') as json_file:\n",
+        "    json_file.write(json_text)\n",
+        "\n",
+        "print(\"JSON text saved to data.json\")\n",
+        "with open('data.json', 'r') as json_file:\n",
+        "    json_text = json_file.read()\n",
+        "\n",
+        "# Now you can use the json_text variable as needed\n",
+        "print(json_text)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "bj6T6HnnKGeT"
+      },
+      "outputs": [],
+      "source": [
+        "start_word = \"affiliation\\\": \"\n",
+        "end_word = \",\"\n",
+        "start_index = text.find(start_word)\n",
+        "end_index = text.find(end_word, start_index + len(start_word))\n",
+        "affiliation = ''\n",
+        "if start_index != -1 and end_index != -1:\n",
+        "    affiliation = text[start_index + len(start_word):end_index].strip()\n",
+        "\n",
+        "print(affiliation)\n",
+        "affiliations=[affiliation]"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "A3n-edxfUE13",
+        "outputId": "6f8c0baf-2a47-4710-9b85-c7cbffed2614"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\": \"https://link.springer.com/article/10.1007/s10509-008-9946-9\"', '\": \"https://link.springer.com/article/10.1007/s10509-008-9808-5\"', '\": \"https://link.springer.com/article/10.1007/s10509-011-0928-y\"', '\": \"https://royalsocietypublishing.org/doi/abs/10.1098/rspa.2011.0182\"', '\": \"https://shodhganga.inflibnet.ac.in/handle/10603/306582\"', '\": \"https://iopscience.iop.org/article/10.1088/1751-8113/42/48/485212/meta\"', '\": \"https://link.springer.com/article/10.1007/s12036-013-9168-6\"', '\": \"https://www.sciencedirect.com/science/article/pii/S1384107613000602\"', '\": \"https://link.springer.com/article/10.1007/s10509-013-1362-0\"', '\": \"https://iopscience.iop.org/article/10.1088/1674-4527/18/12/149/meta\"', '\": \"https://iopscience.iop.org/article/10.1088/1674-4527/18/6/63/meta\"', '\": \"https://scholar.google.com/scholar?cluster=17569678737283715571&hl=en&oi=scholarr\"', '\": \"https://adsabs.harvard.edu/full/2012BASI...40...41P\"']\n"
+          ]
+        }
+      ],
+      "source": [
+        "import re\n",
+        "\n",
+        "start_word = \"pub_url\"\n",
+        "end_word = ','\n",
+        "\n",
+        "escaped_start_word = re.escape(start_word)\n",
+        "escaped_end_word = re.escape(end_word)\n",
+        "\n",
+        "pattern = f\"{escaped_start_word}(.*?){escaped_end_word}\"\n",
+        "matches = re.finditer(pattern, text)\n",
+        "url= []\n",
+        "\n",
+        "for match in matches:\n",
+        "    project = match.group(1).strip()\n",
+        "    url.append(project)\n",
+        "\n",
+        "print(url)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "4PoNHT_aKJAW",
+        "outputId": "b9eb3886-4361-4c33-ef5f-312a07cc02ce"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\": \"Effect of Coriolis force on the shapes of rotating stars and stars in binary systems\"', '\": \"Effect of Coriolis force on the equilibrium structures of rotating stars and stars in binary systems\"', '\": \"Radius of the Roche equipotential surfaces\"', '\": \"Structures and oscillations of rotationally and tidally distorted polytropic models of stars in the presence of the Coriolis force\"', '\": \"Analytic and computational studies of structures and oscillations of rotating stars and stars in binary systems\"', '\": \"Effects of differential rotation on the eigenfrequencies of small adiabatic barotropic modes of oscillations of polytropic models of stars\"', '\": \"On the Use of Roche Equipotentials in Analysing the Problems of Binary and Rotating Stars\"', '\": \"Dimensions and equilibrium structures of the primary component of the nonsynchronous binary systems\"', '\": \"Eigenfrequencies of rotationally and tidally distorted white dwarf models of stars\"', '\": \"Effect of interaction of the various modes on the radial velocity curves of the polytropic models of rotationally and tidally distorted pulsating variable stars\"', '\": \"Effects of rotation and tidal distortions on the shapes of radial velocity curves of polytropic models of pulsating variable stars\"', '\": \"Kippenhahn and Thomas averaging method for the structure of rotating stars\"']\n"
+          ]
+        }
+      ],
+      "source": [
+        "import re\n",
+        "\n",
+        "start_word = \"title\"\n",
+        "end_word = ','\n",
+        "\n",
+        "escaped_start_word = re.escape(start_word)\n",
+        "escaped_end_word = re.escape(end_word)\n",
+        "\n",
+        "pattern = f\"{escaped_start_word}(.*?){escaped_end_word}\"\n",
+        "matches = re.finditer(pattern, text)\n",
+        "titles= []\n",
+        "\n",
+        "for match in matches:\n",
+        "    project = match.group(1).strip()\n",
+        "    titles.append(project)\n",
+        "\n",
+        "print(titles)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "g0DpbopySuwf",
+        "outputId": "b7d3710f-a6e2-4732-d02d-0cb78066e304"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\" \"Effect of Coriolis force on the shapes of rotating stars and stars in binary systems\"', '\" \"Effect of Coriolis force on the equilibrium structures of rotating stars and stars in binary systems\"', '\" \"Radius of the Roche equipotential surfaces\"', '\" \"Structures and oscillations of rotationally and tidally distorted polytropic models of stars in the presence of the Coriolis force\"', '\" \"Analytic and computational studies of structures and oscillations of rotating stars and stars in binary systems\"', '\" \"Effects of differential rotation on the eigenfrequencies of small adiabatic barotropic modes of oscillations of polytropic models of stars\"', '\" \"On the Use of Roche Equipotentials in Analysing the Problems of Binary and Rotating Stars\"', '\" \"Dimensions and equilibrium structures of the primary component of the nonsynchronous binary systems\"', '\" \"Eigenfrequencies of rotationally and tidally distorted white dwarf models of stars\"', '\" \"Effect of interaction of the various modes on the radial velocity curves of the polytropic models of rotationally and tidally distorted pulsating variable stars\"', '\" \"Effects of rotation and tidal distortions on the shapes of radial velocity curves of polytropic models of pulsating variable stars\"', '\" \"Kippenhahn and Thomas averaging method for the structure of rotating stars\"']\n"
+          ]
+        }
+      ],
+      "source": [
+        "titles = [element.replace(':', '') for element in titles]\n",
+        "\n",
+        "print(titles)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "KIWPS8F9SNRo",
+        "outputId": "399b336a-4ca6-4f1a-ac2e-42244dd3fa7a"
+      },
+      "outputs": [
+        {
+          "data": {
+            "text/plain": [
+              "12"
+            ]
+          },
+          "execution_count": 11,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "len(titles)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "Xuo9sPvnkxaD",
+        "outputId": "c97e41ce-2218-4da8-ce34-abc94b2be1b0"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\": 2009', '\": 2008', '\": 2012', '\": 2012', '\": 2010', '\": 2009', '\": 2013', '\": 2014', '\": 2013', '\": 2018', '\": 2018', '\": 2017', '\": 2012']\n"
+          ]
+        }
+      ],
+      "source": [
+        "import re\n",
+        "\n",
+        "start_word = \"pub_year\"\n",
+        "end_word = ','\n",
+        "\n",
+        "escaped_start_word = re.escape(start_word)\n",
+        "escaped_end_word = re.escape(end_word)\n",
+        "\n",
+        "pattern = f\"{escaped_start_word}(.*?){escaped_end_word}\"\n",
+        "matches = re.finditer(pattern, text)\n",
+        "pub_year= []\n",
+        "\n",
+        "for match in matches:\n",
+        "    project = match.group(1).strip()\n",
+        "    pub_year.append(project)\n",
+        "\n",
+        "print(pub_year)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "jT3BSTCjSTXJ",
+        "outputId": "c82c6a27-8447-47b5-d81d-66155d47b3dc"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\" 2009', '\" 2008', '\" 2012', '\" 2012', '\" 2010', '\" 2009', '\" 2013', '\" 2014', '\" 2013', '\" 2018', '\" 2018', '\" 2017', '\" 2012']\n"
+          ]
+        }
+      ],
+      "source": [
+        "pub_year = [element.replace(':', '') for element in pub_year]\n",
+        "\n",
+        "print(pub_year)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "RQAdPcaTpLLx",
+        "outputId": "6f8ea136-1b82-47f6-9b2c-714d93f06b36"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\": 9', '\": 6', '\": 5', '\": 4', '\": 4', '\": 4', '\": 3', '\": 1', '\": 1', '\": 0', '\": 0', '\": 0', '\": 0']\n"
+          ]
+        }
+      ],
+      "source": [
+        "import re\n",
+        "\n",
+        "start_word = \"num_citations\"\n",
+        "end_word = ','\n",
+        "\n",
+        "escaped_start_word = re.escape(start_word)\n",
+        "escaped_end_word = re.escape(end_word)\n",
+        "\n",
+        "pattern = f\"{escaped_start_word}(.*?){escaped_end_word}\"\n",
+        "matches = re.finditer(pattern, text)\n",
+        "num_citations= []\n",
+        "\n",
+        "for match in matches:\n",
+        "    project = match.group(1).strip()\n",
+        "    num_citations.append(project)\n",
+        "\n",
+        "print(num_citations)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "zAKxp2RaQaqp",
+        "outputId": "d48f4a72-9048-4771-e89c-be8336a47cc0"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\": 9', '\": 6', '\": 5', '\": 4', '\": 4', '\": 4', '\": 3', '\": 1', '\": 1', '\": 0', '\": 0', '\": 0', '\": 0']\n"
+          ]
+        }
+      ],
+      "source": [
+        "num_citations = [element.replace(' \":', '') for element in num_citations]\n",
+        "\n",
+        "print(num_citations)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "s3ynglk7RU2J",
+        "outputId": "ab41ab2f-3f9c-4f64-f621-54fd18975721"
+      },
+      "outputs": [
+        {
+          "data": {
+            "text/plain": [
+              "str"
+            ]
+          },
+          "execution_count": 16,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "type(num_citations[0])"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "GHKLMTjspbTd",
+        "outputId": "b6cbc84c-4e05-4ca7-a71b-842a1f5dad4a"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\"AK Lal and Ankush Pathania and C Mohan\"', '\"AK Lal and Ankush Pathania and C Mohan\"', '\"A Pathania and T Medupe\"', '\"A Pathania and AK Lal and C Mohan\"', '\"Ankush Pathania\"', '\"AK Lal and Ankush Pathania and Alka Bhalla and C Mohan\"', '\"A Pathania and AK Lal and C Mohan\"', '\"A Pathania and T Medupe\"', '\"Arvind Kumar Lal and Tarun Kumar and Ankush Pathania\"', '\"Tarun Kumar and Ankush Pathania and Arvind Kumar Lal\"', '\"Tarun Kumar and Arvind Kumar Lal and Ankush Pathania\"', '\"Aashmeen Kaur Chauhan and Ankush Guide Pathania\"', '\"Ankush Pathania and Arvind Kumar Lal and Chander Mohan and Thebe Medupe\"']\n"
+          ]
+        }
+      ],
+      "source": [
+        "import re\n",
+        "\n",
+        "start_word = \"author\\\": \"\n",
+        "end_word = \",\"\n",
+        "\n",
+        "escaped_start_word = re.escape(start_word)\n",
+        "escaped_end_word = re.escape(end_word)\n",
+        "\n",
+        "pattern = f\"{escaped_start_word}(.*?){escaped_end_word}\"\n",
+        "matches = re.finditer(pattern, text)\n",
+        "authors= []\n",
+        "\n",
+        "for match in matches:\n",
+        "    project = match.group(1).strip()\n",
+        "    authors.append(project)\n",
+        "\n",
+        "print(authors)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "PHdZLC4CQGoK",
+        "outputId": "c20c28c0-e487-4a44-cf63-dd20db27b91f"
+      },
+      "outputs": [
+        {
+          "data": {
+            "text/plain": [
+              "['\"AK Lal and Ankush Pathania and C Mohan\"',\n",
+              " '\"AK Lal and Ankush Pathania and C Mohan\"',\n",
+              " '\"A Pathania and T Medupe\"',\n",
+              " '\"A Pathania and AK Lal and C Mohan\"',\n",
+              " '\"Ankush Pathania\"',\n",
+              " '\"AK Lal and Ankush Pathania and Alka Bhalla and C Mohan\"',\n",
+              " '\"A Pathania and AK Lal and C Mohan\"',\n",
+              " '\"A Pathania and T Medupe\"',\n",
+              " '\"Arvind Kumar Lal and Tarun Kumar and Ankush Pathania\"',\n",
+              " '\"Tarun Kumar and Ankush Pathania and Arvind Kumar Lal\"',\n",
+              " '\"Tarun Kumar and Arvind Kumar Lal and Ankush Pathania\"',\n",
+              " '\"Aashmeen Kaur Chauhan and Ankush Guide Pathania\"',\n",
+              " '\"Ankush Pathania and Arvind Kumar Lal and Chander Mohan and Thebe Medupe\"']"
+            ]
+          },
+          "execution_count": 18,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "authors"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "SwyySPJfQMNw",
+        "outputId": "e2d8efc8-2ee9-4ed9-e916-b66070d28fbc"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "['\"AK Lal and Ankush Pathania and C Mohan\"', '\"AK Lal and Ankush Pathania and C Mohan\"', '\"A Pathania and T Medupe\"', '\"A Pathania and AK Lal and C Mohan\"', '\"Ankush Pathania\"', '\"AK Lal and Ankush Pathania and Alka Bhalla and C Mohan\"', '\"A Pathania and AK Lal and C Mohan\"', '\"A Pathania and T Medupe\"', '\"Arvind Kumar Lal and Tarun Kumar and Ankush Pathania\"', '\"Tarun Kumar and Ankush Pathania and Arvind Kumar Lal\"', '\"Tarun Kumar and Arvind Kumar Lal and Ankush Pathania\"', '\"Aashmeen Kaur Chauhan and Ankush Guide Pathania\"', '\"Ankush Pathania and Arvind Kumar Lal and Chander Mohan and Thebe Medupe\"']\n"
+          ]
+        }
+      ],
+      "source": [
+        "authors = [element.replace(',', '') for element in authors]\n",
+        "\n",
+        "print(authors)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "0bi3dhQJJ_Fl"
+      },
+      "outputs": [],
+      "source": [
+        "import csv"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "czWcX_4dKE9P",
+        "outputId": "30fb1696-1e71-4ef8-c5d5-adc3493c357b"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Data has been written to merged_data.csv.\n"
+          ]
+        }
+      ],
+      "source": [
+        "data = zip(affiliations ,titles, url ,pub_year,num_citations )\n",
+        "\n",
+        "filename = 'merged_data.csv'\n",
+        "\n",
+        "with open(filename, 'w', newline='') as csvfile:\n",
+        "    writer = csv.writer(csvfile)\n",
+        "    writer.writerow(['affiliations', 'titles', 'url', 'pub_year', 'num_citations','coauthors'])  # Write header row\n",
+        "    writer.writerows(data)\n",
+        "\n",
+        "print(f\"Data has been written to {filename}.\")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "uokYpxKUbzZ1",
+        "outputId": "6559ca3c-90e3-4473-bfbf-cd778f9ed9cc"
+      },
+      "outputs": [
+        {
+          "ename": "TypeError",
+          "evalue": "ignored",
+          "output_type": "error",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mTypeError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-22-a9c259c6d99f>\u001b[0m in \u001b[0;36m<cell line: 10>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      8\u001b[0m \u001b[0mpage_soup\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mBeautifulSoup\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mpage\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m'html.parser'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      9\u001b[0m \u001b[0mimage_item\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpage_soup\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfind\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'div'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m{\u001b[0m\u001b[0;34m'class'\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m'gs-rimg'\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 10\u001b[0;31m \u001b[0;32mfor\u001b[0m \u001b[0mimg\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mimage_item\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     11\u001b[0m     \u001b[0mimages\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mimg\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfind\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'src'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     12\u001b[0m     \u001b[0mimg_src\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mimg\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mget\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'src'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mTypeError\u001b[0m: 'NoneType' object is not iterable"
+          ]
+        }
+      ],
+      "source": [
+        "import bs4\n",
+        "import urllib.request\n",
+        "from urllib.request import URLopener\n",
+        "from bs4 import BeautifulSoup\n",
+        "\n",
+        "url=\"https://scholar.google.co.in/citations?user=yxqKxj8AAAAJ&hl=en\"\n",
+        "page=urllib.request.urlopen(url)\n",
+        "page_soup=BeautifulSoup(page,'html.parser')\n",
+        "image_item=page_soup.find('div',{'class':'gs-rimg'})\n",
+        "for img in image_item:\n",
+        "    images=img.find('src')\n",
+        "    img_src=img.get('src')\n",
+        "    print(img_src)\n",
+        "    print(images)\n"
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
